@@ -1,25 +1,51 @@
 "use client"
 
 import { Button } from "@/components/ui/button";
+import { WebsiteType } from "@/configs/type";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import addImage from "../../../public/www.png";
 import Link from "next/link";
+import axios from "axios";
+import WebsiteCard from "./_components/WebsiteCard";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Dashboard = () => {
-    const [websiteList, setWebsiteList] = useState([]);
+    const [websiteList, setWebsiteList] = useState<WebsiteType[]>([]);
+    const [loading, setLoading] = useState(true);
+    const fetchUserWebsites = async () => {
+        setLoading(true);
+        const result = await axios.get('/api/website');
+        setWebsiteList(result?.data);
+        setLoading(false);
+    }
+
+    useEffect(() => {
+        fetchUserWebsites();
+    }, [])
     return (
         <div className="mt-8">
             <div className="flex justify-between items-center">
-                <h2 className="font-bold text-xl">My Website</h2>
+                <h2 className="font-bold text-xl">My Websites</h2>
                 <Link href={'/dashboard/new'}>
                     <Button>+ Website</Button>
                 </Link>
             </div>
 
             <div>
+                {loading && <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+                    {[1,2,3,4].map((item, index) => (
+                        <div className="p-4" key={index}>
+                            <div className="flex gap-2 items-center">
+                                <Skeleton className="h-8 w-8 rounded-sm" />
+                                <Skeleton className="h-8 w-1/2 rounded-sm" />
+                            </div>
+                            <Skeleton className="h-[80px] w-full mt-4" />
+                        </div>
+                    ))}
+                </div>}
                 {
-                    websiteList?.length == 0 ? 
+                    !loading&&websiteList?.length == 0 ? 
                         <div className="flex flex-col justify-center items-center gap-4 p-8 border-2 border-dashed rounded-2xl mt-5">
                             <Image src={addImage} alt="add website" width={100} height={100}/>
                             <h2>You don't have any website added for tracking</h2>
@@ -27,8 +53,12 @@ const Dashboard = () => {
                                 <Button>+ Website</Button>
                             </Link>
                         </div>
-                    : <div>
-
+                    : <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 mt-5">
+                        {
+                            websiteList?.map((website, index) => (
+                                <WebsiteCard key={index} website={website} />
+                            ))
+                        }
                     </div>
                 }
             </div>

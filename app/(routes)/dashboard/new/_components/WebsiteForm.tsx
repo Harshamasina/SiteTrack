@@ -5,13 +5,57 @@ import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/in
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@radix-ui/react-separator";
-import { Globe, Plus } from "lucide-react";
+import { Globe, Loader2, Plus } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button";
+import { useState, type FormEvent } from "react";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const WebsiteForm = () => {
-    const onFormSubmit = (e:any) => {
+    const [domain, setDomain] = useState('');
+    const [timeZone, setTimeZone] = useState('');
+    const [enableLocalhostTracking, setEnableLocalhostTracking] = useState(false);
+    const [loading,setLoading] = useState(false);
+    const router = useRouter();
+
+    const onFormSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setLoading(true);
+        const websiteId = crypto.randomUUID();
+        try {
+            const result = await axios.post('/api/website', {
+                websiteId: websiteId,
+                domain: domain,
+                timeZone: timeZone,
+                enableLocalhostTracking: enableLocalhostTracking
+            });
+
+            const payload = Array.isArray(result.data)
+                ? result.data[0]
+                : result.data?.data ?? result.data;
+            const nextWebsiteId = payload?.websiteId ?? websiteId;
+            const nextDomain = payload?.domain ?? domain;
+
+            const params = new URLSearchParams({
+                step: "script",
+                websiteId: nextWebsiteId,
+                domain: nextDomain,
+            });
+
+            toast.success("Website added successfully!");
+            router.push(`/dashboard/new?${params.toString()}`);
+        } catch (error) {
+            const message = axios.isAxiosError(error)
+                ? error.response?.data?.message ?? error.message
+                : error instanceof Error
+                    ? error.message
+                    : "Something went wrong";
+            alert(message);
+        } finally {
+            setLoading(false);
+        }
     }
 
     return (
@@ -25,7 +69,7 @@ const WebsiteForm = () => {
                     <form className="mt-3" onSubmit={(e) => onFormSubmit(e)}>
                         <Label className="text-sm">Domain</Label>
                         <InputGroup>
-                            <InputGroupInput placeholder="mywebsite.com" />
+                            <InputGroupInput type="text" placeholder="mywebsite.com" required onChange={(e) => setDomain('https://'+e.target.value)}/>
                                 <InputGroupAddon>
                                     <Globe />
                                     <span>https://</span>
@@ -35,7 +79,7 @@ const WebsiteForm = () => {
 
                         <div className="mt-3">
                             <Label className="text-sm">Timezone</Label>
-                            <Select>
+                            <Select required onValueChange={(value) => setTimeZone(value)}>
                                 <SelectTrigger className="w-full">
                                     <SelectValue placeholder="Select a timezone" />
                                 </SelectTrigger>
@@ -96,9 +140,11 @@ const WebsiteForm = () => {
                             </Select>
                         </div>
                         <div className="mt-3 flex gap-2 items-center">
-                            <Checkbox /> <span>Enable localhost Tracking in Development</span>
+                            <Checkbox onCheckedChange={(value:boolean) => setEnableLocalhostTracking(value)}/> <span>Enable localhost Tracking in Development</span>
                         </div>
-                        <Button className="mt-5 w-full"><Plus /> Add Website</Button>
+                        <Button className="mt-5 w-full" disabled={loading} type="submit">
+                            {loading ? <Loader2 className="animate-spin" /> : <Plus />} Add Website
+                        </Button>
                     </form>
                 </CardContent>
             </Card>

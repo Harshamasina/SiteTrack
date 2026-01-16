@@ -5,6 +5,7 @@ import {
   ClerkProvider,
 } from '@clerk/nextjs'
 import Provider from "./provider";
+import { Toaster } from "@/components/ui/sonner";
 
 
 
@@ -42,7 +43,7 @@ export default function RootLayout({
         >
           <Provider>
             {children}
-
+            <Toaster />
           </Provider>
         </body>
       </html>
