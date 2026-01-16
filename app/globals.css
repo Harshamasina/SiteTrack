@@ -116,6 +116,13 @@
   --sidebar-ring: oklch(0.552 0.016 285.938);
 }
 
+.app-user-button .cl-userButtonTrigger,
+.app-user-button .cl-userButtonAvatarBox,
+.app-user-button .cl-avatarBox {
+  width: 50px;
+  height: 50px;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

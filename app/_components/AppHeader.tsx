@@ -19,7 +19,17 @@ function AppHeader() {
                             </button>
                         </SignInButton>
                     ) : (
-                        <UserButton />
+                        <div className="app-user-button">
+                            <UserButton
+                                appearance={{
+                                    elements: {
+                                        userButtonTrigger: "h-12 w-12",
+                                        userButtonAvatarBox: "h-12 w-12",
+                                        avatarBox: "h-12 w-12",
+                                    },
+                                }}
+                            />
+                        </div>
                     )}
                 </div>
             </div>

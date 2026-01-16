@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useState } from "react";
 import addImage from "../../../public/www.png";
+import Link from "next/link";
 
 const Dashboard = () => {
     const [websiteList, setWebsiteList] = useState([]);
@@ -11,7 +12,9 @@ const Dashboard = () => {
         <div className="mt-8">
             <div className="flex justify-between items-center">
                 <h2 className="font-bold text-xl">My Website</h2>
-                <Button>+ Website</Button>
+                <Link href={'/dashboard/new'}>
+                    <Button>+ Website</Button>
+                </Link>
             </div>
 
             <div>
@@ -20,7 +23,9 @@ const Dashboard = () => {
                         <div className="flex flex-col justify-center items-center gap-4 p-8 border-2 border-dashed rounded-2xl mt-5">
                             <Image src={addImage} alt="add website" width={100} height={100}/>
                             <h2>You don't have any website added for tracking</h2>
-                            <Button>+ Website</Button>
+                            <Link href={'/dashboard/new'}>
+                                <Button>+ Website</Button>
+                            </Link>
                         </div>
                     : <div>
 
