@@ -65,6 +65,8 @@ export async function GET(req:NextRequest) {
 
     const userEmail = user.primaryEmailAddress.emailAddress;
     const range = req.nextUrl.searchParams.get("range") ?? "all";
+    const websiteOnly = req.nextUrl.searchParams.get("websiteOnly") === "true";
+    const websiteIdFilter = req.nextUrl.searchParams.get("websiteId");
     const fromParam = req.nextUrl.searchParams.get("from");
     const toParam = req.nextUrl.searchParams.get("to");
     const rangeStartMs = Date.now() - 24 * 60 * 60 * 1000;
@@ -82,11 +84,20 @@ export async function GET(req:NextRequest) {
         if (!Number.isFinite(base)) return undefined;
         return base + (24 * 60 * 60 * 1000) - 1;
     })();
+    const websitePredicates = [eq(websiteTable.userEmail, userEmail)];
+    if (websiteIdFilter) {
+        websitePredicates.push(eq(websiteTable.websiteId, websiteIdFilter));
+    }
+
     const websites = await db
         .select()
         .from(websiteTable)
-        .where(eq(websiteTable.userEmail, userEmail))
+        .where(and(...websitePredicates))
         .orderBy(desc(websiteTable.id));
+
+    if (websiteOnly) {
+        return NextResponse.json(websites);
+    }
 
     const result = [];
     type visitorWithCode = { visitors: number; code?: string };

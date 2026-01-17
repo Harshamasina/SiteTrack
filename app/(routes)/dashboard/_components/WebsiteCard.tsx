@@ -6,6 +6,7 @@ import {
 } from "@/components/ui/chart"
 import { WebsiteInfoType } from "@/configs/type";
 import { Globe } from "lucide-react";
+import Link from "next/link";
 
 type Props = {
     websiteInfo: WebsiteInfoType
@@ -31,7 +32,7 @@ const WebsiteCard = ({websiteInfo}:Props) => {
     ] : hourlyData;
 
     return (
-        <div className="">
+        <Link href={`/dashboard/website/${websiteInfo?.website?.websiteId}`}>
             <Card className="p-5">
                 <CardTitle>
                     <div className="flex gap-2 items-center">
@@ -74,7 +75,7 @@ const WebsiteCard = ({websiteInfo}:Props) => {
                     </CardContent>
                 </CardTitle>
             </Card>
-        </div>
+        </Link>
     )
 };
 

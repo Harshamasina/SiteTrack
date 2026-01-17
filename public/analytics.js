@@ -1,5 +1,3 @@
-const { exit } = require("process");
-
 (function(){
     console.log("Analytics Script Loaded");
 
