@@ -1,6 +1,6 @@
 import { boolean, integer, pgTable, varchar } from "drizzle-orm/pg-core";
 import { url } from "inspector";
-import { browser } from "process";
+import { browser, exit } from "process";
 
 export const usersTable = pgTable("users", {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
@@ -38,6 +38,8 @@ export const pageViewTable = pgTable('pageViews', {
     browser: varchar(),
     ip: varchar({ length: 100 }),
     country: varchar({ length: 100 }),
+    countryCode: varchar({ length: 10 }),
     region: varchar({ length: 100 }),
-    city: varchar({ length: 100 })
+    city: varchar({ length: 100 }),
+    exitUrl: varchar({ length: 2048 }),
 });

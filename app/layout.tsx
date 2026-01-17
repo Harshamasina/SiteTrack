@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, DM_Sans } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import {
   ClerkProvider,
@@ -38,15 +39,15 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <script
-          defer
-          data-website-id='7d8ee682-3711-4649-b186-101ad971ad95'
-          data-domain='https://localhost:3000'
-          src='http://localhost:3000/analytics.js'>
-        </script>
         <body
           className={AppFont.className}
         >
+          <Script
+            src="http://localhost:3000/analytics.js"
+            strategy="afterInteractive"
+            data-website-id="7d8ee682-3711-4649-b186-101ad971ad95"
+            data-domain="https://localhost:3000"
+          />
           <Provider>
             {children}
             <Toaster />

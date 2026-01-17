@@ -14,7 +14,7 @@ export async function POST(req:NextRequest) {
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || req.headers.get('x-real-ip') || 'Unknown' || '67.43.247.243';
     const geoRes = await fetch(`http://ip-api.com/json/${ip}`);
     const geoInfo = await geoRes.json(); 
-
+    
     let result;
     if(body?.type == 'entry'){
         result = await db.insert(pageViewTable).values({
@@ -37,17 +37,18 @@ export async function POST(req:NextRequest) {
             browser: browserInfo || 'Unknown',
             ip: ip,
             country: geoInfo.country || 'Unknown',
+            countryCode: geoInfo.countryCode || 'Unknown',
             region: geoInfo.regionName || 'Unknown',
             city: geoInfo.city || 'Unknown'
         }).returning();
     } else {
         result = await db.update(pageViewTable).set({
-          exitTime: body.exitTime,
-          totalActiveTime: body.totalActiveTime,
+            exitTime: body.exitTime,
+            totalActiveTime: body.totalActiveTime,
+            exitUrl: body.exitUrl,
         }).where(eq(pageViewTable.visitorId, body?.visitorId))
         .returning();
     }
-    console.log('Page view logged:', result);
 
     return NextResponse.json({ message: "Data recieved successfully!", data: result }, {status: 200});
 }

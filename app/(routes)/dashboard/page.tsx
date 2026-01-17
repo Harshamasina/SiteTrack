@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button";
-import { WebsiteType } from "@/configs/type";
+import { WebsiteInfoType } from "@/configs/type";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import addImage from "../../../public/www.png";
@@ -9,13 +9,15 @@ import Link from "next/link";
 import axios from "axios";
 import WebsiteCard from "./_components/WebsiteCard";
 import { Skeleton } from "@/components/ui/skeleton";
+import { format } from "date-fns";
 
 const Dashboard = () => {
-    const [websiteList, setWebsiteList] = useState<WebsiteType[]>([]);
+    const [websiteList, setWebsiteList] = useState<WebsiteInfoType[]>([]);
     const [loading, setLoading] = useState(true);
     const fetchUserWebsites = async () => {
         setLoading(true);
-        const result = await axios.get('/api/website');
+        const today = format(new Date(), 'yyyy-MM-dd');
+        const result = await axios.get('/api/website?from=' + '2025-01-01' + '&to=' + today);
         setWebsiteList(result?.data);
         setLoading(false);
     }
@@ -56,7 +58,7 @@ const Dashboard = () => {
                     : <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 mt-5">
                         {
                             websiteList?.map((website, index) => (
-                                <WebsiteCard key={index} website={website} />
+                                <WebsiteCard key={index} websiteInfo={website} />
                             ))
                         }
                     </div>
