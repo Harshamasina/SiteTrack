@@ -1,25 +1,30 @@
-import { SignInButton, UserButton, useUser } from "@clerk/nextjs"
+import { SignInButton, UserButton, useUser } from "@clerk/nextjs";
 import Image from "next/image";
-import logo from "../../public/logo.png";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import logo from "../../public/logo.png";
 
 function AppHeader() {
     const { user } = useUser();
     return (
-        <header className="w-full">
-            <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-2 sm:px-6 lg:px-8">
-                <Link href="/">
-                    <div className="flex items-center gap-3">
-                        <Image src={logo} alt="logo" width={200} height={60} className="h-auto" />
-                    </div>
+        <header className="sticky top-0 z-20 bg-[#26242b]/85 border-b border-white/10 backdrop-blur-xl w-full">
+            <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+                <Link href="/" className="flex items-center gap-2">
+                    <Image src={logo} alt="logo" width={140} height={40} className="h-8 w-auto" />
                 </Link>
-
-                <div id="navbar-collapse-with-animation" className="flex items-center gap-3">
+                <div className="flex items-center gap-3">
+                    {user && (
+                        <Link href="/dashboard">
+                            <Button variant="ghost" className="text-sm text-muted-foreground hover:text-primary transition">
+                                Dashboard
+                            </Button>
+                        </Link>
+                    )}
                     {!user ? (
-                        <SignInButton mode="modal">
-                            <button className="rounded-full bg-gradient-to-r from-slate-900 to-slate-700 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+                        <SignInButton mode="modal" signUpForceRedirectUrl="/dashboard">
+                            <Button className="bg-primary text-primary-foreground hover:bg-primary/90 transition">
                                 Get Started
-                            </button>
+                            </Button>
                         </SignInButton>
                     ) : (
                         <div className="app-user-button">
@@ -37,7 +42,7 @@ function AppHeader() {
                 </div>
             </div>
         </header>
-    )
+    );
 }
 
-export default AppHeader
+export default AppHeader;

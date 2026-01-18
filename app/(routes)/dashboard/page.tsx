@@ -53,30 +53,36 @@ const Dashboard = () => {
     useEffect(() => {
         fetchUserWebsites(range);
     }, [])
+
+    console.log("websiteList:", websiteList);
     
     return (
         <div className="mt-8">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <h2 className="font-bold text-xl">My Websites</h2>
                 <div className="flex items-center gap-3 flex-wrap">
-                    <Select
-                        defaultValue={range}
-                        onValueChange={(value) => {
-                            const nextRange = value as RangeOption;
-                            setRange(nextRange);
-                            fetchUserWebsites(nextRange);
-                        }}
-                    >
-                        <SelectTrigger className="w-44">
-                            <SelectValue placeholder="Select range" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="24h">Past 24 hours</SelectItem>
-                            <SelectItem value="month">Last month</SelectItem>
-                            <SelectItem value="year">Last year</SelectItem>
-                            <SelectItem value="all">All time</SelectItem>
-                        </SelectContent>
-                    </Select>
+                    {
+                        websiteList.length > 0 && (
+                            <Select
+                                defaultValue={range}
+                                onValueChange={(value) => {
+                                    const nextRange = value as RangeOption;
+                                    setRange(nextRange);
+                                    fetchUserWebsites(nextRange);
+                                }}
+                            >
+                                <SelectTrigger className="w-44">
+                                    <SelectValue placeholder="Select range" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="24h">Past 24 hours</SelectItem>
+                                    <SelectItem value="month">Last month</SelectItem>
+                                    <SelectItem value="year">Last year</SelectItem>
+                                    <SelectItem value="all">All time</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        )
+                    }
                     <Link href={'/dashboard/new'}>
                         <Button>+ Website</Button>
                     </Link>

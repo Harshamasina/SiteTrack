@@ -81,7 +81,7 @@ const websiteDetails = () => {
             <PageView websiteInfo={websiteInfo} loading={loading} viewMode={viewMode} />
             <Widgets websiteId={selectedWebsiteId} />
             <RecentIP websiteId={selectedWebsiteId} />
-            <footer className="mt-12 border-t bg-white/70 backdrop-blur-sm">
+            <footer className="mt-12 border-t backdrop-blur-sm">
               <div className="mx-auto flex max-w-6xl flex-col gap-3 px-6 py-6 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-2">
                   <p className="text-xs text-muted-foreground hidden sm:block">SiteTrack</p>

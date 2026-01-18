@@ -1,155 +1,184 @@
-"use client"
+"use client";
 
-import Image from "next/image";  
-import { SignIn, SignInButton, UserButton, useUser } from "@clerk/nextjs";
+import Image from "next/image";
 import Link from "next/link";
+import { SignInButton, UserButton, useUser } from "@clerk/nextjs";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { ArrowRight, BadgeCheck, BadgeCheckIcon, BarChart3, CheckCheckIcon, CheckCircleIcon, Globe2, Layers, Lock, Radar, Sparkles } from "lucide-react";
+
+const highlights = [
+  { title: "Live streams", desc: "Visitors, sessions, and live users in real time." },
+  { title: "Geo + devices", desc: "Countries, cities, devices, OS, and browsers at a glance." },
+  { title: "Session quality", desc: "Total and average active time, time-zone aware." },
+];
+
+const features = [
+  { title: "Hourly & daily charts", desc: "Toggle granularity with smooth transitions.", icon: BarChart3 },
+  { title: "Geo widgets", desc: "Countries, cities, regions with flags.", icon: Globe2 },
+  { title: "Tech mix", desc: "Devices, OS, browsers with smart icons.", icon: Layers },
+  { title: "Recent IP intel", desc: "Click IPs to open ip-api details in-app.", icon: Radar },
+  { title: "Privacy & auth", desc: "Clerk auth on APIs; no invasive tracking.", icon: Lock },
+  { title: "One-line install", desc: "Drop the script and watch data flow instantly.", icon: Sparkles },
+];
 
 export default function Home() {
-
-
   const { user } = useUser();
 
   return (
-    <div>
-      <header className="flex  flex-wrap sm:justify-start  sm:flex-nowrap z-50 w-full bg-white border-b border-gray-200 text-sm py-3 sm:py-0 dark:bg-neutral-800 dark:border-neutral-700">
-        <nav className="relative  p-4 max-w-[85rem] w-full mx-auto px-4 sm:flex sm:items-center sm:justify-between sm:px-6 lg:px-8" aria-label="Global">
-          <div className="flex items-center justify-between">
-            <Link href="/">
-              <div className="flex gap-2 items-center">
-                <Image src={'/logo.png'} alt="logo" width={200} height={150} className="h-15 w-45" />
-              </div>
-            </Link>
-          </div>
-          <div id="navbar-collapse-with-animation" className="hs-collapse hidden overflow-hidden transition-all duration-300 basis-full grow sm:block">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end sm:ps-7 cursor-pointer">
-
-              {/* Clerk Authentication  */}
-              {!user ? <SignInButton mode='modal' signUpForceRedirectUrl={'/dashboard'}>
-                <div className="flex items-center gap-x-2 font-medium text-gray-500 hover:text-blue-600 sm:border-s sm:border-gray-300 py-2 sm:py-0 sm:ms-4 sm:my-6 sm:ps-6 dark:border-neutral-700 dark:text-neutral-400 dark:hover:text-blue-500" >
-                  <svg className="flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z" />
-                  </svg>
-                  Get Started
-                </div>
+    <div className="min-h-screen bg-[#26242b] text-foreground">
+      <header className="sticky top-0 z-20 bg-[#26242b]/85 border-b border-white/10 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
+          <Link href="/" className="flex items-center gap-2">
+            <Image src="/logo.png" alt="logo" width={100} height={150} className="" />
+          </Link>
+          <div className="flex items-center gap-3">
+            {user && (
+              <Link href="/dashboard">
+                <Button variant="ghost" className="text-sm text-muted-foreground transition">
+                  Dashboard
+                </Button>
+              </Link>
+            )}
+            {!user ? (
+              <SignInButton mode="modal" signUpForceRedirectUrl="/dashboard">
+                <Button className="bg-primary text-primary-foreground hover:bg-primary/90 transition">
+                  Sign In
+                </Button>
               </SignInButton>
-                :
-                <UserButton />
-              }
-            </div>
+            ) : (
+              <UserButton />
+            )}
           </div>
-        </nav>
+        </div>
       </header>
-      <div className="relative overflow-hidden before:absolute before:top-0 before:start-1/2 before:bg-[url('https://preline.co/assets/svg/examples/polygon-bg-element.svg')] dark:before:bg-[url('https://preline.co/assets/svg/examples-dark/polygon-bg-element.svg')] before:bg-no-repeat before:bg-top before:bg-cover before:size-full before:-z-[1] before:transform before:-translate-x-1/2">
-        <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-10">
 
-          {/* <div className="flex justify-center">
-            <a className="inline-flex items-center gap-x-2 bg-white border border-gray-200 text-sm text-gray-800 p-1 ps-3 rounded-full transition hover:border-gray-300 dark:bg-neutral-800 dark:border-neutral-700 dark:hover:border-neutral-600 dark:text-neutral-200"
-              href="tubeguruji.com" target="_blank">
-              TUBEGURUJI Membership - Join Now
-              <span className="py-1.5 px-2.5 inline-flex justify-center items-center gap-x-2 rounded-full bg-gray-200 font-semibold text-sm text-gray-600 dark:bg-neutral-700 dark:text-neutral-400">
-                <svg className="flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
-              </span>
-            </a>
-          </div> */}
+      <main className="relative overflow-hidden">
+        {/* Glow accents */}
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute -top-24 left-10 h-80 w-80 rounded-full bg-[#5f72b0]/30 blur-[90px]" />
+          <div className="absolute top-10 right-0 h-96 w-96 rounded-full bg-[#3f497e]/30 blur-[110px]" />
+        </div>
 
-
-
-          <div className="mt-5 max-w-2xl text-center mx-auto">
-            <h1 className="block font-bold text-gray-800 text-4xl md:text-5xl lg:text-6xl dark:text-neutral-200">
-              Know Your Visitors,
-
-
-              <span className="bg-clip-text bg-gradient-to-tl from-blue-600 to-violet-600 text-transparent"> Grow Your Business</span>
-            </h1>
+        {/* Hero */}
+        <section className="relative mx-auto flex max-w-6xl flex-col items-center gap-10 px-4 pb-16 pt-14 text-center sm:px-6">
+          <div className="glass rounded-full px-6 py-2 inline-flex items-center gap-2 text-sm text-primary-foreground/80 border border-white/10 shadow-lg shadow-black/30 animate-fade-in">
+            <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+            Built for Live Analytics of Web Apps
           </div>
-
-
-          <div className="mt-5 max-w-3xl text-center mx-auto">
-            <p className="text-lg text-gray-600 dark:text-neutral-400">
-              Get real-time insights into your website traffic. Make smarter decisions with actionable data.
+          <div className="space-y-6 max-w-3xl animate-fade-up">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight">
+              Live Analytics Updates of Web Apps on the Tip of Your Hands.
+            </h1>
+            <p className="text-lg text-muted-foreground">
+              Clean charts, widgets, and IP intelligence in a single dashboard. No clutter just the correct amount of data you need.
             </p>
           </div>
-
-
-          <div className="mt-8 gap-3 flex justify-center">
-            <a className="inline-flex justify-center items-center 
-      gap-x-3 text-center bg-gradient-to-tl from-blue-600
-       to-violet-600 hover:from-violet-600 hover:to-blue-600 border border-transparent cursor-pointer text-white text-sm font-medium rounded-md focus:outline-none focus:ring-1 focus:ring-gray-600 py-3 px-4 dark:focus:ring-offset-gray-800"
-              href="/dashboard">
-              Get started
-              <svg className="flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
-            </a>
-
+          <div className="flex flex-wrap items-center justify-center gap-4 animate-fade-up">
+            {user ? (
+              <Link href="/dashboard">
+                <Button
+                  size="lg"
+                  className="px-6 bg-primary text-primary-foreground hover:bg-primary/90 transition shadow-lg shadow-primary/30"
+                >
+                  Launch Dashboard <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+            ) : (
+              <SignInButton mode="modal" signUpForceRedirectUrl="/dashboard">
+                <Button
+                  size="lg"
+                  className="px-6 bg-primary text-primary-foreground hover:bg-primary/90 transition shadow-lg shadow-primary/30"
+                >
+                  Get Started <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </SignInButton>
+            )}
+            <Button
+              size="lg"
+              variant="outline"
+              className="px-6 border-white/20 text-white hover:bg-white/5 transition"
+            >
+              View Pricing
+            </Button>
           </div>
+          <div className="grid gap-4 sm:grid-cols-3 w-full max-w-5xl animate-fade-up">
+            {highlights.map((item, idx) => (
+              <Card
+                key={item.title}
+                className="glass border-white/10 text-white transition hover:-translate-y-1 hover:border-primary/40"
+                style={{ animationDelay: `${idx * 100}ms` }}
+              >
+                <CardContent className="p-5 space-y-2">
+                  <h3 className="text-lg font-semibold">{item.title}</h3>
+                  <p className="text-sm text-muted-foreground">{item.desc}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
 
+        {/* Feature grid */}
+        <section className="relative mx-auto max-w-6xl px-4 pb-20 sm:px-6">
+          <Card className="glass border-white/10 text-white shadow-xl shadow-black/30">
+            <CardContent className="p-6 sm:p-8 space-y-6">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">All-in-one dashboard</p>
+                  <h3 className="text-2xl font-semibold">Charts, widgets, and IP details</h3>
+                  <p className="text-sm text-muted-foreground mt-2 max-w-2xl">
+                    Hourly/daily charts, geo and tech widgets with flags/icons, and click-to-expand IP intel powered by ip-api—live inside the app.
+                  </p>
+                </div>
+                <div className="flex gap-3">
+                  <div className="rounded-xl bg-white/5 px-4 py-3 text-white shadow-inner shadow-black/20">
+                    <p className="text-xs text-muted-foreground">Live Users</p>
+                    <span><BadgeCheckIcon /></span>
+                  </div>
 
+                  <div className="rounded-xl bg-white/5 px-4 py-3 text-white shadow-inner shadow-black/20">
+                    <p className="text-xs text-muted-foreground">Geo Loc</p>
+                    <span><BadgeCheckIcon /></span>
+                  </div>
+                </div>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-3">
+                {features.map((card, idx) => {
+                  const Icon = card.icon;
+                  return (
+                    <div
+                      key={card.title}
+                      className="rounded-2xl border border-white/10 bg-white/5 p-4 text-white space-y-2 transition hover:-translate-y-1 hover:border-primary/50"
+                      style={{ animationDelay: `${idx * 50}ms` }}
+                    >
+                      <Icon className="h-5 w-5 text-primary" />
+                      <p className="text-sm font-semibold">{card.title}</p>
+                      <p className="text-sm text-muted-foreground">{card.desc}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
 
-        </div>
-      </div>
-
-
-      {/* <div className="max-w-[85rem] px-4 py-10 sm:px-6 lg:px-8 lg:py-14 mx-auto">
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 items-center gap-2">
-
-          <a className="group flex flex-col justify-center hover:bg-gray-50 rounded-xl p-4 md:p-7 dark:hover:bg-neutral-800" href="#">
-            <div className="flex justify-center items-center size-12 bg-blue-600 rounded-xl">
-              <svg className="flex-shrink-0 size-6 text-white" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="10" height="14" x="3" y="8" rx="2" /><path d="M5 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2h-2.4" /><path d="M8 18h.01" /></svg>
+          <footer className="mt-12 border-t border-white/10 backdrop-blur-sm">
+            <div className="mx-auto flex max-w-6xl flex-col gap-3 px-6 py-6 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-2">
+                <p className="text-xs text-muted-foreground hidden sm:block">SiteTrack</p>
+              </div>
+              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                <a href="mailto:support@sitetrack.app">Support</a>
+                {user && (
+                  <>
+                    <Link href="/">Home</Link>
+                    <Link href="/dashboard">Dashboard</Link>
+                  </>
+                )}
+              </div>
             </div>
-            <div className="mt-5">
-              <h3 className="group-hover:text-gray-600 text-lg font-semibold text-gray-800 dark:text-white dark:group-hover:text-gray-400">25+ templates</h3>
-              <p className="mt-1 text-gray-600 dark:text-neutral-400">Responsive, and mobile-first project on the web</p>
-              <span className="mt-2 inline-flex items-center gap-x-1.5 text-sm text-blue-600 decoration-2 group-hover:underline font-medium">
-                Learn more
-                <svg className="flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
-              </span>
-            </div>
-          </a>
-
-          <a className="group flex flex-col justify-center hover:bg-gray-50 rounded-xl p-4 md:p-7 dark:hover:bg-neutral-800" href="#">
-            <div className="flex justify-center items-center size-12 bg-blue-600 rounded-xl">
-              <svg className="flex-shrink-0 size-6 text-white" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 7h-9" /><path d="M14 17H5" /><circle cx="17" cy="17" r="3" /><circle cx="7" cy="7" r="3" /></svg>
-            </div>
-            <div className="mt-5">
-              <h3 className="group-hover:text-gray-600 text-lg font-semibold text-gray-800 dark:text-white dark:group-hover:text-gray-400">Customizable</h3>
-              <p className="mt-1 text-gray-600 dark:text-neutral-400">Components are easily customized and extendable</p>
-              <span className="mt-2 inline-flex items-center gap-x-1.5 text-sm text-blue-600 decoration-2 group-hover:underline font-medium">
-                Learn more
-                <svg className="flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
-              </span>
-            </div>
-          </a>
-
-          <a className="group flex flex-col justify-center hover:bg-gray-50 rounded-xl p-4 md:p-7 dark:hover:bg-neutral-800" href="#">
-            <div className="flex justify-center items-center size-12 bg-blue-600 rounded-xl">
-              <svg className="flex-shrink-0 size-6 text-white" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" /></svg>
-            </div>
-            <div className="mt-5">
-              <h3 className="group-hover:text-gray-600 text-lg font-semibold text-gray-800 dark:text-white dark:group-hover:text-gray-400">Free to Use</h3>
-              <p className="mt-1 text-gray-600 dark:text-neutral-400">Every component and plugin is well documented</p>
-              <span className="mt-2 inline-flex items-center gap-x-1.5 text-sm text-blue-600 decoration-2 group-hover:underline font-medium">
-                Learn more
-                <svg className="flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
-              </span>
-            </div>
-          </a>
-
-          <a className="group flex flex-col justify-center hover:bg-gray-50 rounded-xl p-4 md:p-7 dark:hover:bg-neutral-800" href="#">
-            <div className="flex justify-center items-center size-12 bg-blue-600 rounded-xl">
-              <svg className="flex-shrink-0 size-6 text-white" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2v5Z" /><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1" /></svg>
-            </div>
-            <div className="mt-5">
-              <h3 className="group-hover:text-gray-600 text-lg font-semibold text-gray-800 dark:text-white dark:group-hover:text-gray-400">24/7 Support</h3>
-              <p className="mt-1 text-gray-600 dark:text-neutral-400">Contact us 24 hours a day, 7 days a week</p>
-              <span className="mt-2 inline-flex items-center gap-x-1.5 text-sm text-blue-600 decoration-2 group-hover:underline font-medium">
-                Learn more
-                <svg className="flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
-              </span>
-            </div>
-          </a>
-
-        </div>
-      </div> */}
-
+          </footer>
+        </section>
+      </main>
     </div>
   );
 }
