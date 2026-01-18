@@ -9,6 +9,7 @@ import { format, isSameDay, subDays, differenceInCalendarDays } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select as RangeSelect, SelectContent as RangeSelectContent, SelectItem as RangeSelectItem, SelectTrigger as RangeSelectTrigger, SelectValue as RangeSelectValue } from "@/components/ui/select";
+import Link from "next/link";
 
 type Props = {
     websiteList: WebsiteType[];
@@ -178,10 +179,11 @@ const FormInput = ({
                     Refresh
                 </Button>
             </div>
-            <Button variant={'outline'} disabled>
-                <Settings2 className="h-4 w-4 mr-2" />
-                Settings
-            </Button>
+            <Link href="/dashboard">
+                <Button>
+                    Dashboard
+                </Button>
+            </Link>
         </div>
     )
 };

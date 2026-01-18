@@ -7,6 +7,9 @@ import {
 } from '@clerk/nextjs'
 import Provider from "./provider";
 import { Toaster } from "@/components/ui/sonner";
+import Link from "next/link";
+import Image from "next/image";
+import logo from "../public/logo.png";
 
 
 

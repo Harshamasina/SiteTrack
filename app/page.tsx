@@ -2,6 +2,7 @@
 
 import Image from "next/image";  
 import { SignIn, SignInButton, UserButton, useUser } from "@clerk/nextjs";
+import Link from "next/link";
 
 export default function Home() {
 
@@ -13,9 +14,11 @@ export default function Home() {
       <header className="flex  flex-wrap sm:justify-start  sm:flex-nowrap z-50 w-full bg-white border-b border-gray-200 text-sm py-3 sm:py-0 dark:bg-neutral-800 dark:border-neutral-700">
         <nav className="relative  p-4 max-w-[85rem] w-full mx-auto px-4 sm:flex sm:items-center sm:justify-between sm:px-6 lg:px-8" aria-label="Global">
           <div className="flex items-center justify-between">
-            <div className="flex gap-2 items-center">
-              <Image src={'/logo.png'} alt="logo" width={200} height={150} className="h-15 w-45" />
-            </div>
+            <Link href="/">
+              <div className="flex gap-2 items-center">
+                <Image src={'/logo.png'} alt="logo" width={200} height={150} className="h-15 w-45" />
+              </div>
+            </Link>
           </div>
           <div id="navbar-collapse-with-animation" className="hs-collapse hidden overflow-hidden transition-all duration-300 basis-full grow sm:block">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end sm:ps-7 cursor-pointer">

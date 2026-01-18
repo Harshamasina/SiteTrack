@@ -6,8 +6,11 @@ import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import FormInput from "./_components/FormInput";
 import PageView from "./_components/PageView";
+import Widgets from "./_components/Widgets";
+import RecentIP from "./_components/RecentIP";
 import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
+import Link from "next/link";
 
 const websiteDetails = () => {
     const { websiteId } = useParams<{ websiteId?: string }>();
@@ -76,6 +79,20 @@ const websiteDetails = () => {
                 loading={loading}
             />
             <PageView websiteInfo={websiteInfo} loading={loading} viewMode={viewMode} />
+            <Widgets websiteId={selectedWebsiteId} />
+            <RecentIP websiteId={selectedWebsiteId} />
+            <footer className="mt-12 border-t bg-white/70 backdrop-blur-sm">
+              <div className="mx-auto flex max-w-6xl flex-col gap-3 px-6 py-6 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center gap-2">
+                  <p className="text-xs text-muted-foreground hidden sm:block">SiteTrack</p>
+                </div>
+                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                  <Link href="/">Home</Link>
+                  <Link href="/dashboard">Dashboard</Link>
+                  <a href="mailto:support@sitetrack.app">Support</a>
+                </div>
+              </div>
+            </footer>
         </div>
     )
 };
