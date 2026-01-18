@@ -54,7 +54,7 @@ const Dashboard = () => {
         fetchUserWebsites(range);
     }, [])
 
-    console.log("websiteList:", websiteList);
+    // console.log("websiteList:", websiteList);
     
     return (
         <div className="mt-8">

@@ -1,9 +1,11 @@
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import {
-  ChartContainer,
-  type ChartConfig,
-} from "@/components/ui/chart"
+    ChartContainer,
+    ChartTooltip,
+    ChartTooltipContent,
+    type ChartConfig,
+} from "@/components/ui/chart";
 import { WebsiteInfoType } from "@/configs/type";
 import { Globe } from "lucide-react";
 import Link from "next/link";
@@ -13,23 +15,38 @@ type Props = {
 }
 
 const chartConfig = {
-    desktop: {
-        label: "Desktop",
-        color: "var(--chart-1)",
+    visitors: {
+        label: "Visitors",
+        color: "var(--color-primary)",
     },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
 const WebsiteCard = ({websiteInfo}:Props) => {
-    const hourlyData = websiteInfo?.analytics?.hourlyVisitors;
-    const chartData = hourlyData?.length == 1 ? [
-        {
-            ...hourlyData[0], 
-            hour:Number(hourlyData[0].hour) - 1 >= 0 ? Number(hourlyData[0].hour) - 1 : 0,
+    const hourlyData = websiteInfo?.analytics?.hourlyVisitors ?? [];
+
+    const formatHourLabel = (hour: number) => {
+        const hour12 = hour % 12 || 12;
+        const suffix = hour < 12 ? "AM" : "PM";
+        return `${hour12} ${suffix}`;
+    };
+
+    const chartData = (() => {
+        const buckets = Array.from({ length: 24 }, (_, hour) => ({
+            hour,
             visitors: 0,
-            hourLabel: `${Number(hourlyData[0].hour - 1)} AM/PM`
-        },
-        hourlyData[0]
-    ] : hourlyData;
+            hourLabel: formatHourLabel(hour),
+        }));
+
+        hourlyData.forEach((item: any) => {
+            const hour = Number(item.hour);
+            if (!Number.isFinite(hour) || hour < 0 || hour > 23) return;
+            const visitors = item.visitors ?? item.count ?? 0;
+            buckets[hour].visitors += visitors;
+        });
+
+        // If all zeros, keep as-is to show empty chart with consistent labels
+        return buckets;
+    })();
 
     return (
         <Link href={`/dashboard/website/${websiteInfo?.website?.websiteId}`}>
@@ -40,27 +57,30 @@ const WebsiteCard = ({websiteInfo}:Props) => {
                         <h2 className="font-bold text-lg">{websiteInfo?.website?.domain.replace(/^(https?:\/\/)?(www\.)?/, '')}</h2>
                     </div>
                     <CardContent>
-                            <ChartContainer config={chartConfig} className="max-h-40 w-full">
+                            <ChartContainer config={chartConfig} className="h-full w-full">
                                 <AreaChart
                                     accessibilityLayer
                                     data={chartData}
                                     margin={{
-                                    left: 12,
-                                    right: 12,
+                                        left: 12,
+                                        right: 12,
                                     }}
                                 >
-                                    {/* <CartesianGrid vertical={false} /> */}
+                                    <CartesianGrid vertical={false} />
                                     {/* <XAxis
-                                        dataKey="month"
+                                        dataKey="hour"
                                         tickLine={false}
                                         axisLine={false}
                                         tickMargin={8}
-                                        tickFormatter={(value) => value.slice(0, 3)}
+                                        interval={0}
+                                        minTickGap={12}
+                                        tickFormatter={(value: number) => chartData[value]?.hourLabel ?? value}
                                     /> */}
-                                    {/* <ChartTooltip
+                                    <YAxis hide domain={[0, "dataMax + 2"]} />
+                                    <ChartTooltip
                                         cursor={false}
                                         content={<ChartTooltipContent indicator="line" />}
-                                    /> */}
+                                    />
                                     <Area
                                         dataKey="visitors"
                                         type="natural"

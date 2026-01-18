@@ -15,6 +15,12 @@ export type analyticType = {
     totalVisitors: number,
     hourlyVisitors: hourlyVisitorType[],
     dailyVisitors: dailyVisitorType[],
+    countries?: NamedMetric[],
+    regions?: NamedMetric[],
+    cities?: NamedMetric[],
+    devices?: NamedMetric[],
+    os?: NamedMetric[],
+    browsers?: NamedMetric[],
 }
 
 export type hourlyVisitorType = {
@@ -39,4 +45,11 @@ export type WebsiteInfoType = {
 export type LiveUserType = {
     visitorId: string,
     websiteId: string,
+}
+
+export type NamedMetric = {
+    name: string,
+    visitors: number,
+    image?: string,
+    code?: string,
 }

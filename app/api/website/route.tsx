@@ -97,8 +97,9 @@ export async function GET(req:NextRequest) {
             if (Number.isFinite(parsed)) return parsed;
         }
         const base = parseDateToMs(toParam);
-        if (!Number.isFinite(base)) return undefined;
-        return base + (24 * 60 * 60 * 1000) - 1;
+        if (typeof base !== "number" || !Number.isFinite(base)) return undefined;
+        const dayMs = 24 * 60 * 60 * 1000;
+        return base + dayMs - 1;
     })();
     const websitePredicates = [eq(websiteTable.userEmail, userEmail)];
     if (websiteIdFilter) {

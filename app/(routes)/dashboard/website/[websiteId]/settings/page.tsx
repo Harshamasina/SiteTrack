@@ -18,11 +18,9 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { WebsiteInfoType } from "@/configs/type";
 import axios from "axios";
-import { ArrowLeftCircleIcon, CopyCheck, CopyIcon, Trash2Icon } from "lucide-react";
+import { ArrowLeftCircleIcon, CopyIcon, Trash2Icon } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import SyntaxHighlighter from "react-syntax-highlighter";
-import { a11yDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { toast } from "sonner";
 
 const WebsiteSettings = () => {
@@ -181,13 +179,9 @@ const WebsiteSettings = () => {
                                 If you update your domain or id, re-copy the script.
                             </p>
                             <div className="relative mt-4">
-                                <SyntaxHighlighter
-                                    language="javascript"
-                                    style={a11yDark}
-                                    customStyle={{ backgroundColor: "#26242b", borderRadius: 8, paddingTop: 16 }}
-                                >
+                                <pre className="bg-[#26242b] text-white rounded-lg p-4 text-sm overflow-x-auto font-mono leading-6">
                                     {scriptSnippet || "// Waiting for website details..."}
-                                </SyntaxHighlighter>
+                                </pre>
                                 <Button
                                     variant="outline"
                                     size="icon"
