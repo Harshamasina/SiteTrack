@@ -127,7 +127,7 @@ export default function Home() {
                   <p className="text-sm text-muted-foreground">All-in-one dashboard</p>
                   <h3 className="text-2xl font-semibold">Charts, widgets, and IP details</h3>
                   <p className="text-sm text-muted-foreground mt-2 max-w-2xl">
-                    Hourly/daily charts, geo and tech widgets with flags/icons, and click-to-expand IP intel powered by ip-api—live inside the app.
+                    Hourly/daily charts, geo and tech widgets, and click to expand IP intel powered by ip-api—live inside the app.
                   </p>
                 </div>
                 <div className="flex gap-3">
@@ -142,6 +142,7 @@ export default function Home() {
                   </div>
                 </div>
               </div>
+              
               <div className="grid gap-4 sm:grid-cols-3">
                 {features.map((card, idx) => {
                   const Icon = card.icon;

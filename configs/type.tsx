@@ -35,3 +35,8 @@ export type WebsiteInfoType = {
     website: WebsiteType,
     analytics: analyticType,
 }
+
+export type LiveUserType = {
+    visitorId: string,
+    websiteId: string,
+}

@@ -43,3 +43,18 @@ export const pageViewTable = pgTable('pageViews', {
     city: varchar({ length: 100 }),
     exitUrl: varchar({ length: 2048 }),
 });
+
+export const liveUserTable = pgTable('liveUsers', {
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    websiteId: varchar({ length: 255 }),
+    visitorId: varchar({ length: 255 }).unique(),
+    last_seen: varchar({ length: 255 }),
+    country: varchar({ length: 100 }),
+    city: varchar({ length: 100 }),
+    region: varchar({ length: 100 }),
+    lat: varchar({ length: 50 }),
+    lon: varchar({ length: 50 }),
+    os: varchar(),
+    browser: varchar(),
+    device: varchar(),
+});

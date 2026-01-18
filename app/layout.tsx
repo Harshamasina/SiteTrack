@@ -4,11 +4,9 @@ import Script from "next/script";
 import "./globals.css";
 import {
   ClerkProvider,
-} from '@clerk/nextjs'
+} from '@clerk/nextjs';
 import Provider from "./provider";
 import { Toaster } from "@/components/ui/sonner";
-
-
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,12 +18,12 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-
 const AppFont = DM_Sans({
   weight: ['400', '500', '700'],
   subsets: ['latin'],
   variable: '--font-app',
 })
+
 export const metadata: Metadata = {
   title: "SiteTrack",
   description: "Clean charts, widgets, and IP intelligence in a single dashboard. No clutter just the correct amount of data you need.",

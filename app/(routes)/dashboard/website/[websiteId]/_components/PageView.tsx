@@ -17,8 +17,9 @@ type Props = {
     websiteInfo: WebsiteInfoType | null | undefined,
     loading?: boolean,
     viewMode?: "hourly" | "daily",
+    liveuserCount?: number,
 }
-const PageView = ({ websiteInfo, loading, viewMode = "hourly" }: Props) => {
+const PageView = ({ websiteInfo, loading, viewMode = "hourly", liveuserCount }: Props) => {
     const webAnalytics = websiteInfo?.analytics;
     const totalVisitors = webAnalytics?.totalVisitors ?? 0;
     const totalSessions = webAnalytics?.totalSessions ?? 0;
@@ -122,7 +123,7 @@ const PageView = ({ websiteInfo, loading, viewMode = "hourly" }: Props) => {
                     <Separator orientation="vertical" className="h-10 hidden sm:block" />
                     <LabelCountItem label='Avg Active Time' value={`${avgActiveMinutes.toFixed(1)} min`} />
                     <Separator orientation="vertical" className="h-10 hidden sm:block" />
-                    <LabelCountItem label='Live Users' value={'2'} />
+                    <LabelCountItem label='Live Users' value={liveuserCount} />
                 </CardContent>
 
                 <CardContent className="p-5 mt-5">

@@ -1,6 +1,6 @@
 "use client";
 
-import { WebsiteInfoType, WebsiteType } from "@/configs/type";
+import { LiveUserType, WebsiteInfoType, WebsiteType } from "@/configs/type";
 import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -21,6 +21,7 @@ const websiteDetails = () => {
     const [selectedWebsiteId, setSelectedWebsiteId] = useState<string | undefined>(websiteId);
     const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
     const [viewMode, setViewMode] = useState<"hourly" | "daily">("hourly");
+    const [liveUsers, setLiveUsers] = useState<LiveUserType[]>([]);
 
     const GetWebsiteList = useCallback(async () => {
         const websites = await axios.get('/api/website?websiteOnly=true');
@@ -46,6 +47,7 @@ const websiteDetails = () => {
         const websiteResult = await axios.get(`/api/website?${params.toString()}`);
         setWebsiteInfo(websiteResult?.data?.[0] ?? null);
         setLoading(false);
+        handleLiveUsers();
     }, [dateRange?.from, dateRange?.to, selectedWebsiteId]);
 
     useEffect(() => {
@@ -65,6 +67,15 @@ const websiteDetails = () => {
         GetWebsiteAnalyticDetail();
     };
 
+    const handleLiveUsers = async () => {
+        const result = await axios.get(`/api/live?websiteId=${selectedWebsiteId}`);
+        console.log("Live Users:", result.data);
+        setLiveUsers(result.data.activeUsers || []);
+    };
+
+    console.log("live users", liveUsers);
+    console.log("live users length", liveUsers.length);
+
     return (
         <div className="mt-10">
             <FormInput
@@ -78,7 +89,7 @@ const websiteDetails = () => {
                 onViewModeChange={setViewMode}
                 loading={loading}
             />
-            <PageView websiteInfo={websiteInfo} loading={loading} viewMode={viewMode} />
+            <PageView websiteInfo={websiteInfo} loading={loading} viewMode={viewMode} liveuserCount={liveUsers?.length} />
             <Widgets websiteId={selectedWebsiteId} />
             <RecentIP websiteId={selectedWebsiteId} />
             <footer className="mt-12 border-t backdrop-blur-sm">
