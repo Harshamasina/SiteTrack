@@ -1,18 +1,19 @@
 import { db } from "@/configs/db";
 import { pageViewTable } from "@/configs/schema";
-import { NextRequest, NextResponse } from "next/server";
+import { corsJson, corsOptionsResponse } from "@/lib/cors";
+import { NextRequest } from "next/server";
 
 export async function POST(req: NextRequest) {
     const body = await req.json();
     const rows = Array.isArray(body) ? body : [body];
 
     if (rows.length === 0) {
-        return NextResponse.json({ message: "No data provided" }, { status: 400 });
+        return corsJson({ message: "No data provided" }, { status: 400 });
     }
 
     for (const row of rows) {
         if (!row?.websiteId || !row?.domain) {
-            return NextResponse.json(
+            return corsJson(
                 { message: "websiteId and domain are required for each record" },
                 { status: 400 }
             );
@@ -46,10 +47,14 @@ export async function POST(req: NextRequest) {
 
     const result = await db.insert(pageViewTable).values(values).returning();
 
-    return NextResponse.json(
+    return corsJson(
         { message: "Dummy data inserted", count: result.length, data: result },
         { status: 200 }
     );
+}
+
+export function OPTIONS() {
+    return corsOptionsResponse();
 }
 
 // export async function POST() {

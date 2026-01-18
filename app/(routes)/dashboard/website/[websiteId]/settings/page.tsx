@@ -12,12 +12,13 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { WebsiteInfoType } from "@/configs/type";
 import axios from "axios";
-import { ArrowLeftCircleIcon, CopyIcon, Trash2Icon } from "lucide-react";
+import { ArrowLeftCircleIcon, CopyCheck, CopyIcon, Trash2Icon } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import SyntaxHighlighter from "react-syntax-highlighter";
@@ -154,15 +155,15 @@ const WebsiteSettings = () => {
                 variant="ghost"
                 onClick={() => router.push(`/dashboard/website/${websiteId ?? ""}`)}
                 disabled={!websiteId || loading}
-                className="flex items-center gap-2 w-fit px-0"
+                className="flex items-center gap-2 w-fit px-3"
             >
-                <ArrowLeftCircleIcon className="h-4 w-4" />
+                <ArrowLeftCircleIcon />
                 Back
             </Button>
             <div className="space-y-1">
                 <h2 className="font-bold text-2xl text-primary">Settings for {websiteLabel}</h2>
                 <p className="text-muted-foreground text-sm">
-                    Manage script installation and dangerous actions for this website.
+                    Manage script installation and delete actions for this website.
                 </p>
             </div>
 
@@ -199,6 +200,20 @@ const WebsiteSettings = () => {
                                 </Button>
                             </div>
                         </CardHeader>
+                    </Card>
+
+                    <Card className="mt-6">
+                        <CardHeader>
+                            <CardTitle>Domain</CardTitle>
+                            <CardDescription>Your main website domain for analytics tracking</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <Input placeholder="website.com" value={websiteInfo?.website?.domain.replace("https://", "")} />
+                            <div className="flex justify-between mt-3">
+                                <h2>Your Public SiteTrack Id is {websiteId}</h2>
+                                <CopyIcon />
+                            </div>
+                        </CardContent>
                     </Card>
                 </TabsContent>
                 <TabsContent value="other">

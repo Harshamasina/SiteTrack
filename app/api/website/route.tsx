@@ -1,15 +1,16 @@
 import { db } from "@/configs/db";
 import { liveUserTable, pageViewTable, websiteTable } from "@/configs/schema";
+import { corsJson, corsOptionsResponse } from "@/lib/cors";
 import { currentUser } from "@clerk/nextjs/server";
 import { and, desc, eq, sql } from "drizzle-orm";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
 export async function POST(req: NextRequest) {
     const { websiteId, domain, timeZone, enableLocalhostTracking } = await req.json();
     const user = await currentUser();
 
     if (!user?.primaryEmailAddress?.emailAddress) {
-        return NextResponse.json(
+        return corsJson(
             { message: "Unauthorized or missing email address" },
             { status: 401 }
         );
@@ -23,7 +24,7 @@ export async function POST(req: NextRequest) {
         .where(and(eq(websiteTable.domain, domain), eq(websiteTable.userEmail, userEmail)));
 
     if (existingDomain.length > 0) {
-        return NextResponse.json(
+        return corsJson(
             { message: "Domain already exists!", data: existingDomain[0] },
             { status: 400 }
         );
@@ -40,7 +41,7 @@ export async function POST(req: NextRequest) {
         })
         .returning();
 
-    return NextResponse.json(result);
+    return corsJson(result);
 }
 
 // export async function GET(req:NextRequest) {
@@ -57,7 +58,7 @@ export async function GET(req:NextRequest) {
     const user = await currentUser();
 
     if (!user?.primaryEmailAddress?.emailAddress) {
-        return NextResponse.json(
+        return corsJson(
             { message: "Unauthorized or missing email address" },
             { status: 401 }
         );
@@ -69,17 +70,32 @@ export async function GET(req:NextRequest) {
     const websiteIdFilter = req.nextUrl.searchParams.get("websiteId");
     const fromParam = req.nextUrl.searchParams.get("from");
     const toParam = req.nextUrl.searchParams.get("to");
+    const fromMsParam = req.nextUrl.searchParams.get("fromMs");
+    const toMsParam = req.nextUrl.searchParams.get("toMs");
     const rangeStartMs = Date.now() - 24 * 60 * 60 * 1000;
 
     const parseDateToMs = (value: string | null) => {
         if (!value) return undefined;
-        const d = new Date(value);
-        const ms = d.getTime();
+        const [y, m, d] = value.split("-").map((v) => Number(v));
+        if (!y || !m || !d) return undefined;
+        const localDate = new Date(y, m - 1, d, 0, 0, 0);
+        const ms = localDate.getTime();
         return Number.isFinite(ms) ? ms : undefined;
     };
 
-    const startMs = parseDateToMs(fromParam);
+    const startMs = (() => {
+        if (fromMsParam) {
+            const parsed = Number(fromMsParam);
+            if (Number.isFinite(parsed)) return parsed;
+        }
+        return parseDateToMs(fromParam);
+    })();
+
     const endMs = (() => {
+        if (toMsParam) {
+            const parsed = Number(toMsParam);
+            if (Number.isFinite(parsed)) return parsed;
+        }
         const base = parseDateToMs(toParam);
         if (!Number.isFinite(base)) return undefined;
         return base + (24 * 60 * 60 * 1000) - 1;
@@ -96,7 +112,7 @@ export async function GET(req:NextRequest) {
         .orderBy(desc(websiteTable.id));
 
     if (websiteOnly) {
-        return NextResponse.json(websites);
+        return corsJson(websites);
     }
 
     const result = [];
@@ -209,6 +225,12 @@ export async function GET(req:NextRequest) {
             hour12: true,
         });
 
+        const formatHourLabel = (hour: number) => {
+            const hour12 = hour % 12 || 12;
+            const suffix = hour < 12 ? "AM" : "PM";
+            return `${hour12} ${suffix}`;
+        };
+
         let totalActiveTime = 0;
         let totalSessions = 0;
 
@@ -274,6 +296,47 @@ export async function GET(req:NextRequest) {
             }
         });
 
+        // Ensure hourly buckets exist from 12 AM to 11 PM for all dates in range
+        const dateSet = new Set<string>(Object.values(hourlyMap).map((h) => h.date));
+        if (Number.isFinite(startMs) && Number.isFinite(endMs)) {
+            const dayMs = 24 * 60 * 60 * 1000;
+            for (let t = startMs!; t <= endMs!; t += dayMs) {
+                dateSet.add(dateFormatter.format(new Date(t)));
+            }
+        }
+        if (!dateSet.size && views.length) {
+            // Fallback to dates derived from view data if range isn't provided
+            const datesFromViews = views
+                .map((v) => {
+                    const rawEpoch = Number(v.entryTime);
+                    if (!Number.isFinite(rawEpoch)) return undefined;
+                    const unixMs = rawEpoch < 10_000_000_000 ? rawEpoch * 1000 : rawEpoch;
+                    return dateFormatter.format(new Date(unixMs));
+                })
+                .filter(Boolean) as string[];
+            datesFromViews.forEach((d) => dateSet.add(d));
+        }
+        if (!dateSet.size) {
+            // At least one day to render even if empty
+            dateSet.add(dateFormatter.format(new Date()));
+        }
+
+        dateSet.forEach((date) => {
+            for (let h = 0; h < 24; h++) {
+                const key = `${date}-${h}`;
+                if (!hourlyMap[key]) {
+                    hourlyMap[key] = {
+                        date,
+                        hour: h,
+                        hourLabel: formatHourLabel(h),
+                        visitors: 0,
+                    };
+                } else if (!hourlyMap[key].hourLabel) {
+                    hourlyMap[key].hourLabel = formatHourLabel(hourlyMap[key].hour);
+                }
+            }
+        });
+
         const hourlyVisitors = Object.values(hourlyMap).sort((a, b) =>
             a.date === b.date
                 ? a.hour - b.hour
@@ -300,7 +363,7 @@ export async function GET(req:NextRequest) {
         },
         });
     }
-    return NextResponse.json(result);
+    return corsJson(result);
 }
 
 export async function DELETE(req: NextRequest) {
@@ -308,14 +371,14 @@ export async function DELETE(req: NextRequest) {
     const websiteId = req.nextUrl.searchParams.get("websiteId");
 
     if (!user?.primaryEmailAddress?.emailAddress) {
-        return NextResponse.json(
+        return corsJson(
             { message: "Unauthorized or missing email address" },
             { status: 401 }
         );
     }
 
     if (!websiteId) {
-        return NextResponse.json(
+        return corsJson(
             { message: "websiteId is required" },
             { status: 400 }
         );
@@ -329,7 +392,7 @@ export async function DELETE(req: NextRequest) {
         .where(and(eq(websiteTable.websiteId, websiteId), eq(websiteTable.userEmail, userEmail)));
 
     if (!website?.length) {
-        return NextResponse.json(
+        return corsJson(
             { message: "Website not found or you do not have access" },
             { status: 404 }
         );
@@ -341,5 +404,9 @@ export async function DELETE(req: NextRequest) {
         .delete(websiteTable)
         .where(and(eq(websiteTable.websiteId, websiteId), eq(websiteTable.userEmail, userEmail)));
 
-    return NextResponse.json({ message: "Website deleted successfully" });
+    return corsJson({ message: "Website deleted successfully" });
+}
+
+export function OPTIONS() {
+    return corsOptionsResponse();
 }

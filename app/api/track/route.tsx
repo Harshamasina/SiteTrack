@@ -1,7 +1,8 @@
 import { db } from "@/configs/db";
 import { pageViewTable } from "@/configs/schema";
+import { corsJson, corsOptionsResponse } from "@/lib/cors";
 import { eq } from "drizzle-orm";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { UAParser } from 'ua-parser-js';
 
 export async function POST(req:NextRequest) {
@@ -50,5 +51,9 @@ export async function POST(req:NextRequest) {
         .returning();
     }
 
-    return NextResponse.json({ message: "Data recieved successfully!", data: result }, {status: 200});
+    return corsJson({ message: "Data recieved successfully!", data: result }, {status: 200});
+}
+
+export function OPTIONS() {
+    return corsOptionsResponse();
 }

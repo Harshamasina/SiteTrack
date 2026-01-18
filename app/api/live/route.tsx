@@ -1,7 +1,8 @@
 import { db } from "@/configs/db";
-import { liveUserTable } from "@/configs/schema"
+import { liveUserTable } from "@/configs/schema";
+import { corsJson, corsOptionsResponse } from "@/lib/cors";
 import { eq } from "drizzle-orm";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { UAParser } from "ua-parser-js";
 
 type GeoInfo = {
@@ -71,18 +72,18 @@ export async function POST(req: NextRequest) {
         try {
             body = await req.json();
         } catch {
-            return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+            return corsJson({ error: "Invalid JSON body" }, { status: 400 });
         }
 
         const { visitorId, websiteId, last_seen } = body;
 
         if (!visitorId || !websiteId) {
-            return NextResponse.json({ error: "visitorId and websiteId are required" }, { status: 400 });
+            return corsJson({ error: "visitorId and websiteId are required" }, { status: 400 });
         }
 
         const parsedLastSeen = last_seen === undefined ? Date.now() : Number(last_seen);
         if (!Number.isFinite(parsedLastSeen) || parsedLastSeen <= 0) {
-            return NextResponse.json({ error: "last_seen must be a valid timestamp" }, { status: 400 });
+            return corsJson({ error: "last_seen must be a valid timestamp" }, { status: 400 });
         }
         const lastSeenString = parsedLastSeen.toString();
 
@@ -129,13 +130,13 @@ export async function POST(req: NextRequest) {
                 },
             });
 
-        return NextResponse.json(
+        return corsJson(
             { message: "Live user data recorded/updated successfully." },
             { status: 200 },
         );
     } catch (err) {
         console.error("Error in live route:", err);
-        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+        return corsJson({ error: "Internal Server Error" }, { status: 500 });
     }
 }
 
@@ -144,7 +145,7 @@ export async function GET(req: NextRequest) {
         const websiteId = req.nextUrl.searchParams.get("websiteId");
 
         if (!websiteId) {
-            return NextResponse.json({ error: "websiteId is required" }, { status: 400 });
+            return corsJson({ error: "websiteId is required" }, { status: 400 });
         }
 
         const rows = await db
@@ -158,9 +159,13 @@ export async function GET(req: NextRequest) {
             return Number.isFinite(lastSeen) && lastSeen > now - ACTIVE_WINDOW_MS;
         });
 
-        return NextResponse.json({ activeUsers }, { status: 200 });
+        return corsJson({ activeUsers }, { status: 200 });
     } catch (err) {
         console.error("Error fetching live users:", err);
-        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+        return corsJson({ error: "Internal Server Error" }, { status: 500 });
     }
+}
+
+export function OPTIONS() {
+    return corsOptionsResponse();
 }

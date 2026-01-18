@@ -1,13 +1,14 @@
-import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/configs/db";
 import { pageViewTable } from "@/configs/schema";
+import { corsJson, corsOptionsResponse } from "@/lib/cors";
 import { desc, eq } from "drizzle-orm";
+import { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {
     const websiteId = req.nextUrl.searchParams.get("websiteId");
 
     if (!websiteId) {
-        return NextResponse.json({ message: "websiteId is required" }, { status: 400 });
+        return corsJson({ message: "websiteId is required" }, { status: 400 });
     }
 
     try {
@@ -34,11 +35,15 @@ export async function GET(req: NextRequest) {
             return true;
         }).slice(0, 20);
 
-        return NextResponse.json(unique);
+        return corsJson(unique);
     } catch (error: any) {
-        return NextResponse.json(
+        return corsJson(
             { message: "Failed to fetch recent IPs", error: error?.message || "Unknown error" },
             { status: 500 }
         );
     }
+}
+
+export function OPTIONS() {
+    return corsOptionsResponse();
 }

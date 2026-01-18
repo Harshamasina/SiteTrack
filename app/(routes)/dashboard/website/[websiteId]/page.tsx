@@ -8,7 +8,7 @@ import FormInput from "./_components/FormInput";
 import PageView from "./_components/PageView";
 import Widgets from "./_components/Widgets";
 import RecentIP from "./_components/RecentIP";
-import { format } from "date-fns";
+import { endOfDay, format, startOfDay } from "date-fns";
 import { DateRange } from "react-day-picker";
 import Link from "next/link";
 
@@ -39,9 +39,12 @@ const websiteDetails = () => {
 
         if (dateRange?.from) {
             params.set("from", format(dateRange.from, "yyyy-MM-dd"));
+            params.set("fromMs", startOfDay(dateRange.from).getTime().toString());
         }
         if (dateRange?.to || dateRange?.from) {
-            params.set("to", format(dateRange?.to ?? dateRange.from!, "yyyy-MM-dd"));
+            const toDate = dateRange?.to ?? dateRange.from!;
+            params.set("to", format(toDate, "yyyy-MM-dd"));
+            params.set("toMs", endOfDay(toDate).getTime().toString());
         }
 
         const websiteResult = await axios.get(`/api/website?${params.toString()}`);

@@ -27,6 +27,30 @@ const PageView = ({ websiteInfo, loading, viewMode = "hourly", liveuserCount }: 
     const avgActiveMinutes = webAnalytics ? (webAnalytics.avgActiveTime ?? 0) / 60000 : 0;
     const hourlyData = webAnalytics?.hourlyVisitors ?? [];
 
+    const formatHourLabel = (hour: number) => {
+        const hour12 = hour % 12 || 12;
+        const suffix = hour < 12 ? "AM" : "PM";
+        return `${hour12} ${suffix}`;
+    };
+
+    const normalizedHourly = (() => {
+        const buckets = Array.from({ length: 24 }, (_, hour) => ({
+            hour,
+            key: hour,
+            label: formatHourLabel(hour),
+            visitors: 0,
+        }));
+
+        hourlyData.forEach((item: any) => {
+            const hour = Number(item.hour);
+            if (!Number.isFinite(hour) || hour < 0 || hour > 23) return;
+            const visitors = item.visitors ?? item.count ?? 0;
+            buckets[hour].visitors += visitors;
+        });
+
+        return buckets;
+    })();
+
     // Build daily aggregates from hourly data if API does not provide dailyVisitors
     const dailyAggregates = (() => {
         const map = new Map<string, number>();
@@ -47,7 +71,7 @@ const PageView = ({ websiteInfo, loading, viewMode = "hourly", liveuserCount }: 
     const sourceData =
         viewMode === "daily"
             ? webAnalytics?.dailyVisitors ?? dailyAggregates
-            : hourlyData;
+            : normalizedHourly;
 
     const chartData =
         sourceData?.map((item: any, idx: number) => {
@@ -59,8 +83,10 @@ const PageView = ({ websiteInfo, loading, viewMode = "hourly", liveuserCount }: 
             const label =
                 viewMode === "daily" && parsedDate && !isNaN(parsedDate.getTime())
                     ? formatDate(parsedDate, "MMM d")
-                    : (viewMode === "daily" ? rawDate : item.hourLabel ?? rawDate ?? `${idx}`);
-            const key = item.dayLabel ?? item.hourLabel ?? rawDate ?? `${idx}`;
+                    : (viewMode === "daily" ? rawDate : item.label ?? item.hourLabel ?? rawDate ?? `${idx}`);
+            const key = viewMode === "hourly"
+                ? item.hour ?? idx
+                : item.dayLabel ?? item.hourLabel ?? rawDate ?? `${idx}`;
 
             return {
                 key,

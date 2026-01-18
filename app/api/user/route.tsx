@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { corsJson, corsOptionsResponse } from "@/lib/cors";
+import { NextRequest } from "next/server";
 import { eq } from "drizzle-orm";
 import { db } from "@/configs/db";
 import { usersTable } from "@/configs/schema";
@@ -9,7 +10,7 @@ export async function POST(req: NextRequest) {
         const user = await currentUser();
 
         if (!user || !user.primaryEmailAddress?.emailAddress) {
-            return NextResponse.json(
+            return corsJson(
                 { error: "Unauthorized or missing email address" },
                 { status: 401 }
             );
@@ -24,7 +25,7 @@ export async function POST(req: NextRequest) {
             .where(eq(usersTable.email, email));
 
         if (existingUsers.length > 0) {
-            return NextResponse.json(existingUsers[0]);
+            return corsJson(existingUsers[0]);
         }
 
         // Insert new user
@@ -36,8 +37,12 @@ export async function POST(req: NextRequest) {
             })
             .returning();
 
-        return NextResponse.json(insertedUsers[0]);
+        return corsJson(insertedUsers[0]);
     } catch (e: any) {
-        return NextResponse.json({ error: e.message || "Server error" }, { status: 500 });
+        return corsJson({ error: e.message || "Server error" }, { status: 500 });
     }
+}
+
+export function OPTIONS() {
+    return corsOptionsResponse();
 }
