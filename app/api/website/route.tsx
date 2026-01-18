@@ -1,5 +1,5 @@
 import { db } from "@/configs/db";
-import { pageViewTable, websiteTable } from "@/configs/schema";
+import { liveUserTable, pageViewTable, websiteTable } from "@/configs/schema";
 import { currentUser } from "@clerk/nextjs/server";
 import { and, desc, eq, sql } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
@@ -301,4 +301,45 @@ export async function GET(req:NextRequest) {
         });
     }
     return NextResponse.json(result);
+}
+
+export async function DELETE(req: NextRequest) {
+    const user = await currentUser();
+    const websiteId = req.nextUrl.searchParams.get("websiteId");
+
+    if (!user?.primaryEmailAddress?.emailAddress) {
+        return NextResponse.json(
+            { message: "Unauthorized or missing email address" },
+            { status: 401 }
+        );
+    }
+
+    if (!websiteId) {
+        return NextResponse.json(
+            { message: "websiteId is required" },
+            { status: 400 }
+        );
+    }
+
+    const userEmail = user.primaryEmailAddress.emailAddress;
+
+    const website = await db
+        .select()
+        .from(websiteTable)
+        .where(and(eq(websiteTable.websiteId, websiteId), eq(websiteTable.userEmail, userEmail)));
+
+    if (!website?.length) {
+        return NextResponse.json(
+            { message: "Website not found or you do not have access" },
+            { status: 404 }
+        );
+    }
+
+    await db.delete(pageViewTable).where(eq(pageViewTable.websiteId, websiteId));
+    await db.delete(liveUserTable).where(eq(liveUserTable.websiteId, websiteId));
+    await db
+        .delete(websiteTable)
+        .where(and(eq(websiteTable.websiteId, websiteId), eq(websiteTable.userEmail, userEmail)));
+
+    return NextResponse.json({ message: "Website deleted successfully" });
 }
