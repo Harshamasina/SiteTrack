@@ -5,6 +5,17 @@ import { currentUser } from "@clerk/nextjs/server";
 import { and, desc, eq, sql } from "drizzle-orm";
 import { NextRequest } from "next/server";
 
+const sanitizeDomain = (value?: string) => {
+    if (!value || typeof value !== "string") return "";
+    const trimmed = value.trim();
+    if (!trimmed) return "";
+
+    const withoutProtocol = trimmed.replace(/^https?:\/\//i, "");
+    const hostOnly = withoutProtocol.split(/[/?#]/)[0].replace(/\/+$/, "");
+
+    return hostOnly ? `https://${hostOnly}` : "";
+};
+
 export async function POST(req: NextRequest) {
     const { websiteId, domain, timeZone, enableLocalhostTracking } = await req.json();
     const user = await currentUser();
@@ -17,11 +28,19 @@ export async function POST(req: NextRequest) {
     }
 
     const userEmail = user.primaryEmailAddress.emailAddress;
+    const sanitizedDomain = sanitizeDomain(domain);
+
+    if (!sanitizedDomain) {
+        return corsJson(
+            { message: "Invalid domain" },
+            { status: 400 }
+        );
+    }
 
     const existingDomain = await db
         .select()
         .from(websiteTable)
-        .where(and(eq(websiteTable.domain, domain), eq(websiteTable.userEmail, userEmail)));
+        .where(and(eq(websiteTable.domain, sanitizedDomain), eq(websiteTable.userEmail, userEmail)));
 
     if (existingDomain.length > 0) {
         return corsJson(
@@ -33,7 +52,7 @@ export async function POST(req: NextRequest) {
     const result = await db
         .insert(websiteTable)
         .values({
-            domain: domain,
+            domain: sanitizedDomain,
             websiteId: websiteId,
             timeZone: timeZone,
             enableLocalhostTracking: enableLocalhostTracking,

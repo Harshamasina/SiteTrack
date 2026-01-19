@@ -12,25 +12,81 @@ import { useState, type FormEvent } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useUser } from "@clerk/nextjs";
 
 const WebsiteForm = () => {
     const [domain, setDomain] = useState('');
+    const [domainInput, setDomainInput] = useState('');
     const [timeZone, setTimeZone] = useState('');
     const [enableLocalhostTracking, setEnableLocalhostTracking] = useState(false);
     const [loading,setLoading] = useState(false);
     const router = useRouter();
+    const { user } = useUser();
+
+    const normalizeDomain = (value: string) => {
+        const trimmed = value.trim();
+        if (!trimmed) return "";
+
+        const withoutProtocol = trimmed.replace(/^https?:\/\//i, "");
+        const withoutPath = withoutProtocol.split(/[/?#]/)[0];
+
+        return withoutPath.replace(/\/+$/, "");
+    };
+
+    const handleDomainChange = (value: string) => {
+        const normalized = normalizeDomain(value);
+        setDomainInput(normalized);
+        setDomain(normalized ? `https://${normalized}` : "");
+    };
 
     const onFormSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        const normalizedDomain = normalizeDomain(domainInput || domain);
+        if (!normalizedDomain) {
+            toast.error("Please enter a valid domain");
+            return;
+        }
+
+        const plan =
+            (user?.publicMetadata as Record<string, unknown> | null | undefined)?.plan ||
+            (user?.unsafeMetadata as Record<string, unknown> | null | undefined)?.plan ||
+            "";
+        const isPremium = typeof plan === "string" && plan.toLowerCase() === "monthly";
+
+        if (!isPremium) {
+            try {
+                const existing = await axios.get('/api/website?websiteOnly=true');
+                const sites = Array.isArray(existing.data)
+                    ? existing.data
+                    : existing.data?.data ?? [];
+                if (sites.length >= 3) {
+                    toast.error('Limit Exceeded, Join Monthly Plan');
+                    router.push('/dashboard/pricing');
+                    return;
+                }
+            } catch (err) {
+                toast.error("Unable to verify website limit right now");
+                return;
+            }
+        }
+
         setLoading(true);
         const websiteId = crypto.randomUUID();
+        const domainWithProtocol = `https://${normalizedDomain}`;
+
         try {
             const result = await axios.post('/api/website', {
                 websiteId: websiteId,
-                domain: domain,
+                domain: domainWithProtocol,
                 timeZone: timeZone,
                 enableLocalhostTracking: enableLocalhostTracking
             });
+
+            if(result?.data?.error == "limit"){
+                toast.error('Limit Exceeded, Join Monthly Plan');
+                router.push('/dashboard/pricing');
+                return;
+            }
 
             const payload = Array.isArray(result.data)
                 ? result.data[0]
@@ -47,12 +103,18 @@ const WebsiteForm = () => {
             toast.success("Website added successfully!");
             router.push(`/dashboard/new?${params.toString()}`);
         } catch (error) {
-            const message = axios.isAxiosError(error)
-                ? error.response?.data?.message ?? error.message
-                : error instanceof Error
-                    ? error.message
-                    : "Something went wrong";
-            alert(message);
+            if (axios.isAxiosError(error)) {
+                const apiMessage = error.response?.data?.message ?? error.message;
+                if (apiMessage === "Domain already exists!") {
+                    toast.error("Domain already exists!");
+                    return;
+                }
+                toast.error(apiMessage || "Something went wrong");
+                return;
+            }
+
+            const message = error instanceof Error ? error.message : "Something went wrong";
+            toast.error(message);
         } finally {
             setLoading(false);
         }
@@ -69,11 +131,17 @@ const WebsiteForm = () => {
                     <form className="mt-3" onSubmit={(e) => onFormSubmit(e)}>
                         <Label className="text-sm">Domain</Label>
                         <InputGroup>
-                            <InputGroupInput type="text" placeholder="mywebsite.com" required onChange={(e) => setDomain('https://'+e.target.value)}/>
-                                <InputGroupAddon>
-                                    <Globe />
-                                    <span>https://</span>
-                                </InputGroupAddon>
+                            <InputGroupInput
+                                type="text"
+                                placeholder="mywebsite.com"
+                                required
+                                value={domainInput}
+                                onChange={(e) => handleDomainChange(e.target.value)}
+                            />
+                            <InputGroupAddon>
+                                <Globe />
+                                <span>https://</span>
+                            </InputGroupAddon>
                             <InputGroupAddon align="inline-end">Enter</InputGroupAddon>
                         </InputGroup>
 

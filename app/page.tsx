@@ -5,7 +5,8 @@ import Link from "next/link";
 import { SignInButton, UserButton, useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowRight, BadgeCheck, BadgeCheckIcon, BarChart3, CheckCheckIcon, CheckCircleIcon, Globe2, Layers, Lock, Radar, Sparkles } from "lucide-react";
+import { ArrowRight, BadgeCheckIcon, BadgeDollarSign, Banknote, BarChart3, Globe2, Layers, Lock, Radar, Sparkles } from "lucide-react";
+import { toast } from "sonner";
 
 const highlights = [
   { title: "Live streams", desc: "Visitors, sessions, and live users in real time." },
@@ -24,6 +25,10 @@ const features = [
 
 export default function Home() {
   const { user } = useUser();
+
+  const handleButton = () => {
+    toast.success("Sign In to view Pricing Plans");
+  }
 
   return (
     <div className="min-h-screen bg-[#26242b] text-foreground">
@@ -94,13 +99,28 @@ export default function Home() {
                 </Button>
               </SignInButton>
             )}
-            <Button
-              size="lg"
-              variant="outline"
-              className="px-6 border-white/20 text-white hover:bg-white/5 transition"
-            >
-              View Pricing
-            </Button>
+            {
+              user ? (
+                <Link href={'/dashboard/pricing'}>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="px-6 border-white/20 text-white hover:bg-white/5 transition"
+                  >
+                    <BadgeDollarSign /> View Pricing
+                  </Button>
+                </Link>
+              ) : (
+                <Button
+                    size="lg"
+                    variant="outline"
+                    className="px-6 border-white/20 text-white hover:bg-white/5 transition"
+                    onClick={handleButton}
+                  >
+                    <Banknote /> $3 Per Month
+                </Button>
+              )
+            }
           </div>
           <div className="grid gap-4 sm:grid-cols-3 w-full max-w-5xl animate-fade-up">
             {highlights.map((item, idx) => (
