@@ -14,6 +14,7 @@ type BarItem = {
 
 type Props = {
     websiteId?: string;
+    refreshKey?: number;
 };
 
 const WidgetBar = ({ item, max }: { item: BarItem; max: number }) => {
@@ -60,7 +61,7 @@ const EmptyState = () => (
     </div>
 );
 
-const Widgets = ({ websiteId }: Props) => {
+const Widgets = ({ websiteId, refreshKey }: Props) => {
     const [data, setData] = useState<WebsiteInfoType | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -80,7 +81,7 @@ const Widgets = ({ websiteId }: Props) => {
             }
         };
         fetchData();
-    }, [websiteId]);
+    }, [websiteId, refreshKey]);
 
     const analytics = data?.analytics;
 

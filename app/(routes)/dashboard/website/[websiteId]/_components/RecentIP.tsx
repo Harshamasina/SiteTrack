@@ -34,9 +34,10 @@ type IpDetails = {
 
 type Props = {
     websiteId?: string;
+    refreshKey?: number;
 };
 
-const RecentIP = ({ websiteId }: Props) => {
+const RecentIP = ({ websiteId, refreshKey }: Props) => {
     const [ips, setIps] = useState<IpInfo[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -61,7 +62,7 @@ const RecentIP = ({ websiteId }: Props) => {
             }
         };
         fetchIps();
-    }, [websiteId]);
+    }, [websiteId, refreshKey]);
 
     const fetchDetails = async (ip: string) => {
         setDetailsLoading(true);

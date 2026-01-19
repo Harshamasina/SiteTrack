@@ -22,6 +22,7 @@ const websiteDetails = () => {
     const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
     const [viewMode, setViewMode] = useState<"hourly" | "daily">("hourly");
     const [liveUsers, setLiveUsers] = useState<LiveUserType[]>([]);
+    const [refreshKey, setRefreshKey] = useState(0);
 
     const GetWebsiteList = useCallback(async () => {
         const websites = await axios.get('/api/website?websiteOnly=true');
@@ -68,6 +69,7 @@ const websiteDetails = () => {
 
     const handleRefresh = () => {
         GetWebsiteAnalyticDetail();
+        setRefreshKey((key) => key + 1);
     };
 
     const handleLiveUsers = async () => {
@@ -93,8 +95,8 @@ const websiteDetails = () => {
                 loading={loading}
             />
             <PageView websiteInfo={websiteInfo} loading={loading} viewMode={viewMode} liveuserCount={liveUsers?.length} />
-            <Widgets websiteId={selectedWebsiteId} />
-            <RecentIP websiteId={selectedWebsiteId} />
+            <Widgets websiteId={selectedWebsiteId} refreshKey={refreshKey} />
+            <RecentIP websiteId={selectedWebsiteId} refreshKey={refreshKey} />
             <footer className="mt-12 border-t backdrop-blur-sm">
               <div className="mx-auto flex max-w-6xl flex-col gap-3 px-6 py-6 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-2">
