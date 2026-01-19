@@ -39,6 +39,10 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const host =
+    process.env.NEXT_PUBLIC_HOST_URL?.replace(/\/+$/, "") ||
+    "https://sitetrack-nextjs.vercel.app";
+
   return (
     <ClerkProvider>
       <html lang="en">
@@ -46,10 +50,10 @@ export default function RootLayout({
           className={AppFont.className}
         >
           <Script
-            src="http://localhost:3000/analytics.js"
+            src={`${host}/analytics.js`}
             strategy="afterInteractive"
             data-website-id="7d8ee682-3711-4649-b186-101ad971ad95"
-            data-domain="https://localhost:3000"
+            data-domain={host}
           />
           <Provider>
             {children}

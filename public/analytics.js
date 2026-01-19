@@ -95,7 +95,7 @@
     // window.addEventListener('pagehide', handleExit);
 
     const sendLivePing = () => {
-        fetch('http://localhost:3000/api/live', {
+        fetch(`${baseUrl}/api/live`, {
             method: 'POST',
             headers: {
                 'content-type': 'application/json'

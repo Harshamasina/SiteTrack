@@ -22,7 +22,7 @@ const AddWebsite = async ({ searchParams }: PageProps) => {
     const showScript = params?.step === "script";
     const websiteId = params?.websiteId ?? "";
     const domain = params?.domain ?? "";
-    const hostUrl = process.env.NEXT_PUBLIC_HOST_URL ?? "http://localhost:3000";
+    const hostUrl = (process.env.NEXT_PUBLIC_HOST_URL ?? "https://sitetrack-nextjs.vercel.app").replace(/\/+$/, "");
     const scriptLines = [
         "<script",
         "    defer",

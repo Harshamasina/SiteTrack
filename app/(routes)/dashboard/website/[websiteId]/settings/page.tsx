@@ -64,7 +64,7 @@ const WebsiteSettings = () => {
         if (typeof window !== "undefined") {
             return window.location.origin;
         }
-        return "http://localhost:3000";
+        return "https://sitetrack-nextjs.vercel.app";
     }, []);
 
     const sanitizedDomain = useMemo(() => {
