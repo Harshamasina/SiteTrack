@@ -52,7 +52,7 @@ export default function RootLayout({
           <Script
             src={`${host}/analytics.js`}
             strategy="afterInteractive"
-            data-website-id="7d8ee682-3711-4649-b186-101ad971ad95"
+            data-website-id="477e1c0e-edb0-4891-b2a9-fbd993074145"
             data-domain={host}
           />
           <Provider>
