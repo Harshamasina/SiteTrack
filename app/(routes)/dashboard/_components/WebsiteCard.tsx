@@ -43,8 +43,6 @@ const WebsiteCard = ({websiteInfo}:Props) => {
             const visitors = item.visitors ?? item.count ?? 0;
             buckets[hour].visitors += visitors;
         });
-
-        // If all zeros, keep as-is to show empty chart with consistent labels
         return buckets;
     })();
 
@@ -56,7 +54,7 @@ const WebsiteCard = ({websiteInfo}:Props) => {
                         <Globe className="h-8 w-8 p-2 rounded-md bg-primary text-white" />
                         <h2 className="font-bold text-lg">{websiteInfo?.website?.domain.replace(/^(https?:\/\/)?(www\.)?/, '')}</h2>
                     </div>
-                    <CardContent>
+                    <CardContent className="mt-3">
                             <ChartContainer config={chartConfig} className="h-full w-full">
                                 <AreaChart
                                     accessibilityLayer
@@ -91,7 +89,7 @@ const WebsiteCard = ({websiteInfo}:Props) => {
                                     />
                                 </AreaChart>
                             </ChartContainer>
-                            <h2 className="text-sm pt-2"><strong>{websiteInfo?.analytics?.totalVisitors}</strong> Visitors</h2>
+                            <h2 className="text-sm pt-3"><strong>{websiteInfo?.analytics?.totalVisitors}</strong> Visitors</h2>
                     </CardContent>
                 </CardTitle>
             </Card>

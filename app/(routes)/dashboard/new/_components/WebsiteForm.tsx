@@ -47,13 +47,31 @@ const WebsiteForm = () => {
             return;
         }
 
-        const plan =
-            (user?.publicMetadata as Record<string, unknown> | null | undefined)?.plan ||
-            (user?.unsafeMetadata as Record<string, unknown> | null | undefined)?.plan ||
-            "";
-        const isPremium = typeof plan === "string" && plan.toLowerCase() === "monthly";
+        const publicMeta = (user?.publicMetadata as Record<string, unknown> | null | undefined) ?? {};
+        const unsafeMeta = (user?.unsafeMetadata as Record<string, unknown> | null | undefined) ?? {};
 
-        if (!isPremium) {
+        const plan =
+            (typeof publicMeta.plan === "string" && publicMeta.plan) ||
+            (typeof unsafeMeta.plan === "string" && unsafeMeta.plan) ||
+            "";
+        const subscriptionStatus =
+            (typeof publicMeta.subscription_status === "string" && publicMeta.subscription_status) ||
+            (typeof unsafeMeta.subscription_status === "string" && unsafeMeta.subscription_status) ||
+            "";
+
+        const normalizedPlan = plan.toLowerCase();
+        const normalizedStatus = subscriptionStatus.toLowerCase();
+
+        const isPremiumOrTrial =
+            normalizedPlan === "monthly" ||
+            normalizedPlan === "trial" ||
+            normalizedPlan === "free trial" ||
+            normalizedStatus === "trialing" ||
+            normalizedStatus === "active";
+
+        const skipLimitCheck = isPremiumOrTrial || process.env.NODE_ENV === "development";
+
+        if (!skipLimitCheck) {
             try {
                 const existing = await axios.get('/api/website?websiteOnly=true');
                 const sites = Array.isArray(existing.data)
