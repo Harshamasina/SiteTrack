@@ -9,7 +9,7 @@ import Link from "next/link";
 import axios from "axios";
 import WebsiteCard from "./_components/WebsiteCard";
 import { Skeleton } from "@/components/ui/skeleton";
-import { format, subDays } from "date-fns";
+import { endOfDay, format, startOfDay, subDays } from "date-fns";
 import {
     Select,
     SelectContent,
@@ -28,20 +28,25 @@ const Dashboard = () => {
         setLoading(true);
         try {
             const today = new Date();
-            const to = format(today, "yyyy-MM-dd");
-            let url = "/api/website";
+            const params = new URLSearchParams();
 
             if (selectedRange === "24h") {
-                url += "?range=24h";
-            } else if (selectedRange === "month") {
-                const from = format(subDays(today, 30), "yyyy-MM-dd");
-                url += `?from=${from}&to=${to}`;
-            } else if (selectedRange === "year") {
-                const from = format(subDays(today, 365), "yyyy-MM-dd");
-                url += `?from=${from}&to=${to}`;
+                params.set("range", "24h");
+            } else if (selectedRange === "month" || selectedRange === "year") {
+                const days = selectedRange === "month" ? 30 : 365;
+                const fromDate = subDays(today, days);
+                const toDate = today;
+
+                params.set("from", format(fromDate, "yyyy-MM-dd"));
+                params.set("to", format(toDate, "yyyy-MM-dd"));
+                params.set("fromMs", startOfDay(fromDate).getTime().toString());
+                params.set("toMs", endOfDay(toDate).getTime().toString());
             } else {
                 // all time: no query params
             }
+
+            const query = params.toString();
+            const url = query ? `/api/website?${query}` : "/api/website";
 
             const result = await axios.get(url);
             setWebsiteList(result?.data);

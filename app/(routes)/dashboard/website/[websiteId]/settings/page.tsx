@@ -78,7 +78,7 @@ const WebsiteSettings = () => {
         if (!id || !sanitizedDomain) return "";
 
         return [
-            "<script",
+            "<script>",
             "  defer",
             `  data-website-id=\"${id}\"`,
             `  data-domain=\"${sanitizedDomain}\"`,

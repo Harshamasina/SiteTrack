@@ -12,6 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { BarChart3 } from "lucide-react";
 import { format as formatDate, parseISO } from "date-fns";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type Props = {
     websiteInfo: WebsiteInfoType | null | undefined,
@@ -20,6 +21,7 @@ type Props = {
     liveuserCount?: number,
 }
 const PageView = ({ websiteInfo, loading, viewMode = "hourly", liveuserCount }: Props) => {
+    const isMobile = useIsMobile();
     const webAnalytics = websiteInfo?.analytics;
     const totalVisitors = webAnalytics?.totalVisitors ?? 0;
     const totalSessions = webAnalytics?.totalSessions ?? 0;
@@ -164,16 +166,22 @@ const PageView = ({ websiteInfo, loading, viewMode = "hourly", liveuserCount }: 
                                 <XAxis
                                     dataKey="key"
                                     tickLine={false}
-                                    axisLine={false}
-                                    tickMargin={12}
-                                    interval={0}
-                                    minTickGap={12}
-                                    tickFormatter={(value) => {
-                                        const match = chartData.find((d) => d.key === value);
-                                        return match?.label || value;
-                                    }}
-                                    label={{ value: xAxisLabel, position: "insideBottom", offset: 16 }}
-                                />
+                                axisLine={false}
+                                tickMargin={12}
+                                interval={0}
+                                minTickGap={12}
+                                tick={!isMobile}
+                                tickFormatter={(value) => {
+                                    if (isMobile) return "";
+                                    const match = chartData.find((d) => d.key === value);
+                                    return match?.label || value;
+                                }}
+                                label={
+                                    isMobile
+                                        ? undefined
+                                        : { value: xAxisLabel, position: "insideBottom", offset: 16 }
+                                }
+                            />
                                 <YAxis
                                     tickLine={false}
                                     axisLine={false}
