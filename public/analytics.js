@@ -5,9 +5,10 @@
         return Date.now().toString(36) + Math.random().toString(36).substring(2, 9);
     }
 
-    const session_duration = 12*60*50*1000;
+    const session_duration = 12 * 60 * 50 * 1000;
     const now = Date.now();
-    let sessionTime = localStorage.getItem('webtrack_session_time');
+    const sessionTimeRaw = localStorage.getItem('webtrack_session_time');
+    const sessionTime = Number(sessionTimeRaw) || 0;
 
     let visitorId = localStorage.getItem('webtrack_visitor_id');
     if(!visitorId || (now - sessionTime) > session_duration){
@@ -17,7 +18,7 @@
         }
         visitorId = generateUUID();
         localStorage.setItem('webtrack_visitor_id', visitorId);
-        localStorage.setItem('webtrack_session_time', now);
+        localStorage.setItem('webtrack_session_time', now.toString());
     } else {
         console.log("Exising Session");
     }
@@ -67,11 +68,52 @@
 
     let activeStartTime = Date.now();
     let totalActiveTime = 0;
+    let lastActivityTime = Date.now();
+    const IDLE_TIMEOUT = 30000; // 30 seconds
+
+    function startActive(){
+        if(activeStartTime === null){
+            activeStartTime = Date.now();
+        }
+    }
+
+    function stopActive(){
+        if(activeStartTime !== null){
+            totalActiveTime += Date.now() - activeStartTime;
+            activeStartTime = null;
+        }
+    }
+
+    ["mousemove", "keydown", "scroll", "click", "touchstart"].forEach((evt) => {
+        window.addEventListener(evt, () => {
+            lastActivityTime = Date.now();
+            startActive();
+        }, {passive: true});
+    })
+
+    setInterval(() => {
+        if(Date.now() - lastActivityTime > IDLE_TIMEOUT){
+            stopActive();
+        } else {
+            startActive();
+        }
+    }, 5000);
+
+    document.addEventListener("visibilitychange", () => {
+        if(document.visibilityState === "hidden"){
+            stopActive();
+        } else {
+            lastActivityTime = Date.now();
+            startActive();
+        }
+    });
+
+
 
     const handleExit = () => {
-        const exitTime = Math.floor(Date.now() / 1000);
-        totalActiveTime += Date.now() - activeStartTime;
+        stopActive();
 
+        const exitTime = Math.floor(Date.now() / 1000);
         fetch(`${baseUrl}/api/track`, {
             method: 'POST',
             keepalive: true,
@@ -89,10 +131,11 @@
             })
         })
 
-        localStorage.clear();
+        localStorage.removeItem('webtrack_session_time');
+        localStorage.removeItem('webtrack_visitor_id');
     }
     window.addEventListener('beforeunload', handleExit);
-    // window.addEventListener('pagehide', handleExit);
+    window.addEventListener('pagehide', handleExit);
 
     const sendLivePing = () => {
         fetch(`${baseUrl}/api/live`, {
@@ -108,5 +151,5 @@
             })
         })
     };
-    setInterval(sendLivePing, 10000);
+    setInterval(sendLivePing, 30000);
 })();
