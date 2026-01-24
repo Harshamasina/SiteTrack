@@ -82,7 +82,7 @@ const WebsiteSettings = () => {
             "  defer",
             `  data-website-id=\"${id}\"`,
             `  data-domain=\"${sanitizedDomain}\"`,
-            `  src=\"${normalizedHost}/analytics.js\">`,
+            `  src=\"${normalizedHost}/analytics.js\"`,
             "</script>",
         ].join("\n");
     }, [normalizedHost, sanitizedDomain, websiteId, websiteInfo?.website?.websiteId]);

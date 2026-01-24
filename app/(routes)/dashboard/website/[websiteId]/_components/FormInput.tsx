@@ -4,7 +4,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { useEffect, useMemo } from "react";
-import { CalendarIcon, RefreshCcw, Settings2, Settings2Icon } from "lucide-react";
+import { CalendarIcon, MoveLeftIcon, RefreshCcw, Settings2Icon } from "lucide-react";
 import { format, isSameDay, subDays, differenceInCalendarDays } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -182,7 +182,7 @@ const FormInput = ({
             <div className="flex items-center gap-3">
                 <Link href="/dashboard">
                     <Button>
-                        Dashboard
+                        <MoveLeftIcon /> Dashboard
                     </Button>
                 </Link>
                 <Link href={`/dashboard/website/${selectedWebsiteId}/settings`}>

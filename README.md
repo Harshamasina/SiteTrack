@@ -39,4 +39,4 @@ Place this in your site's `<head>`, replacing the placeholders:
   src="http://localhost:3000/analytics.js">
 </script>
 ```
-The script persists a visitor/session id in `localStorage`, captures referrer + UTM params, tracks active time/exit URL, and sends 30s live pings to `/api/live`.
+The script persists a visitor/session id in `localStorage`, captures referrer + UTM params, tracks active time/exit URL, and sends 30s live pings to `/api/live`.```````
